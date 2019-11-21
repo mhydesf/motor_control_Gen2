@@ -1,0 +1,14 @@
+#goal definition
+float32 baseAngle
+float32 mainAngle
+float32 secAngle
+float32 toolAngle
+---
+#result definition
+bool motionComplete
+---
+#feedback definition
+int32 baseCS
+int32 mainCS
+int32 secCS
+int32 toolCS
