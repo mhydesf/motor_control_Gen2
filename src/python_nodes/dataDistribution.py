@@ -66,8 +66,6 @@ class server(object):
             self.checkIndex()
 
             return resp
-        else:
-            return None
 
     def runServer(self):
         '''
