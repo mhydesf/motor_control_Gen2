@@ -204,3 +204,6 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(DataHandle src/cpp_nodes/DataHandle.cpp)
+target_link_libraries(DataHandle ${catkin_LIBRARIES})
