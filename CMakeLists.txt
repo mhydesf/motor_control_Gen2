@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(motor_control)
-include(rosbuild)
-rosbuild_init()
-rosbuild_genmsg()
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -16,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  actionlib_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,23 +56,21 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  DIRECTORY srv
+  FILES coordinatePass.srv
+)
 
 ## Generate actions in the 'action' folder
-add_action_files(
-  DIRECTORY action
-  FILES motorpose.action
-)
+#add_action_files(
+#  DIRECTORY action
+#  FILES motorpose.action
+#)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs
-  actionlib_msgs
 )
 
 ################################################
@@ -109,7 +103,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
+  #INCLUDE_DIRS include
   LIBRARIES motor_control
   CATKIN_DEPENDS message_generation message_runtime roscpp rospy std_msgs actionlib_msgs
   #DEPENDS system_lib

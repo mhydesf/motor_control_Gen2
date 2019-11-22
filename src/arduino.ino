@@ -45,7 +45,6 @@ vector handled by the DataHandler
 #include "ros.h"
 #include "std_msgs/Empty.h"
 
-
 void messageCallback(const std_msgs::Empty& toggle_msg){
     for (int i = 0; i < NUM_STEPPERS; i++) {
         prepareMovement( i, 800 );
