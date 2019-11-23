@@ -1,20 +1,29 @@
 #include "ros/ros.h"
 #include "motor_control/coordinatePass.h"
-#include <cstdlib>
+#include "DataHandle.h"
 
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "coordinatePassClient");
+DataHandle::DataHandle(){
+
+}
+
+void DataHandle::requestCoordinate(){
 
   ros::NodeHandle node;
   ros::ServiceClient client = node.serviceClient<motor_control::coordinatePass>("coordinatePass");
   motor_control::coordinatePass srv;
   srv.request.request = true;
   client.call(srv);
+}
+
+DataHandle::~DataHandle(){
+}
+
+int main(int argc, char **argv){
   
-  std::cout << srv.response.xCoordinate << std::endl;
-  std::cout << srv.response.yCoordinate << std::endl;
-  std::cout << srv.response.zCoordinate << std::endl;
+  ros::init(argc, argv, "coordinatePassClient");
+  DataHandle client;
+
+  client.requestCoordinate();
 
   return 0;
 }
