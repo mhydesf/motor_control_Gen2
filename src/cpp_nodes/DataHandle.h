@@ -5,9 +5,9 @@ class DataHandle{
 private:
     
 public:
-    DataHandle(float xComp, float yComp, float zComp);
+    DataHandle(void);
 
-
+    void requestCoordinate();
     
     ~DataHandle(void);
 };
