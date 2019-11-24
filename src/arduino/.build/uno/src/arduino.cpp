@@ -1,3 +1,24 @@
+#include <Arduino.h>
+#include "ros.h"
+#include "motor_control/motorPose.h"
+void baseStep();
+void baseDir(int dir);
+void mainStep();
+void mainDir(int dir);
+void secStep();
+void secDir(int dir);
+void toolStep();
+void toolDir(int dir);
+void resetStepperInfo(struct stepperInfo& si);
+void setup(int argc, char **argv);
+void resetStepper(volatile struct stepperInfo& si);
+float getDurationOfAcceleration(volatile stepperInfo& s, unsigned int numSteps);
+void prepareMovement(int whichMotor, long steps);
+void setNextInterruptInterval();
+void runAndWait();
+void adjustSpeedScales();
+void loop();
+#line 1 "src/arduino.ino"
 /*
 ROSSerial Node run on Arduino UNO
 
@@ -42,22 +63,23 @@ vector handled by the DataHandler
 #define NUM_STEPPERS 4
 
 
-#include "ros.h"
-#include "motor_control/motorPose.h"
+//#include "ros.h"
+//#include "motor_control/motorPose.h"
 
-void positionMotors(motor_control::motorPose& motorAngles){
+void positionMotors(motor_control::motorPoseRequest& motorAngles,
+                    motor_control::motorPoseResponse& resp){
     
-    motorAngles.response.state = false;
+    resp.state = false;
 
     delay(250);
 
-    prepareMovement(0, motorAngles.request.baseAng);
-    prepareMovement(1, motorAngles.request.mainAng);
-    prepareMovement(2, motorAngles.request.secAng);
-    prepareMovement(3, motorAngles.request.toolAng);
+    prepareMovement(0, motorAngles.baseAng);
+    prepareMovement(1, motorAngles.mainAng);
+    prepareMovement(2, motorAngles.secAng);
+    prepareMovement(3, motorAngles.toolAng);
     runAndWait();
 
-    motorAngles.response.state = true;
+    resp.state = true;
 
 }
 
