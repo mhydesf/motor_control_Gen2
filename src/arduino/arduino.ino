@@ -43,35 +43,23 @@ vector handled by the DataHandler
 
 
 #include "ros.h"
-#include "std_msgs/Empty.h"
+#include "motor_control/motorPose.h"
 
-void messageCallback(const std_msgs::Empty& toggle_msg){
-    for (int i = 0; i < NUM_STEPPERS; i++) {
-        prepareMovement( i, 800 );
-        runAndWait();
-    }
+void positionMotors(motor_control::motorPose& motorAngles){
+    
+    motorAngles.response.state = false;
 
     delay(250);
 
-    prepareMovement(0, 400);
-    prepareMovement(1, 400);
-    prepareMovement(2, 400);
-    prepareMovement(3, 400);
+    prepareMovement(0, motorAngles.request.baseAng);
+    prepareMovement(1, motorAngles.request.mainAng);
+    prepareMovement(2, motorAngles.request.secAng);
+    prepareMovement(3, motorAngles.request.toolAng);
     runAndWait();
 
-    delay(250);
+    motorAngles.response.state = true;
 
-    prepareMovement(0, -400);
-    prepareMovement(1, -400);
-    prepareMovement(2, -400);
-    prepareMovement(3, -400);
-    runAndWait();
-
-    delay(250);
 }
-
-ros::NodeHandle node;
-ros::Subscriber<std_msgs::Empty> sub("toggle_led", &messageCallback);
 
 struct stepperInfo {
   // externally defined parameters
@@ -151,10 +139,12 @@ void resetStepperInfo(struct stepperInfo& si) {
 
 volatile stepperInfo steppers[NUM_STEPPERS];
 
-void setup(){
+void setup(int argc, char **argv){
 
-    node.initNode();
-    node.subscribe(sub);
+    ros::init(argc, argv, "motorPoseServer");
+    ros::NodeHandle n;
+
+    ros::ServiceServer service = n.advertiseService("motorPose", positionMotors);
 
     pinMode(resolutionL1,      OUTPUT);
     pinMode(resolutionL2,      OUTPUT);
@@ -371,7 +361,5 @@ void adjustSpeedScales() {
 }
 
 void loop(){
-    
-    node.spinOnce();
-
+  ros::spin();
 }
