@@ -1,24 +1,3 @@
-#include <Arduino.h>
-#include "ros.h"
-#include "motor_control/motorPose.h"
-void baseStep();
-void baseDir(int dir);
-void mainStep();
-void mainDir(int dir);
-void secStep();
-void secDir(int dir);
-void toolStep();
-void toolDir(int dir);
-void resetStepperInfo(struct stepperInfo& si);
-void setup(int argc, char **argv);
-void resetStepper(volatile struct stepperInfo& si);
-float getDurationOfAcceleration(volatile stepperInfo& s, unsigned int numSteps);
-void prepareMovement(int whichMotor, long steps);
-void setNextInterruptInterval();
-void runAndWait();
-void adjustSpeedScales();
-void loop();
-#line 1 "src/arduino.ino"
 /*
 ROSSerial Node run on Arduino UNO
 
@@ -63,8 +42,10 @@ vector handled by the DataHandler
 #define NUM_STEPPERS 4
 
 
-//#include "ros.h"
-//#include "motor_control/motorPose.h"
+#include "ros.h"
+#include "motor_control/motorPose.h"
+
+ros::NodeHandle n;
 
 void positionMotors(motor_control::motorPoseRequest& motorAngles,
                     motor_control::motorPoseResponse& resp){
@@ -162,11 +143,6 @@ void resetStepperInfo(struct stepperInfo& si) {
 volatile stepperInfo steppers[NUM_STEPPERS];
 
 void setup(int argc, char **argv){
-
-    ros::init(argc, argv, "motorPoseServer");
-    ros::NodeHandle n;
-
-    ros::ServiceServer service = n.advertiseService("motorPose", positionMotors);
 
     pinMode(resolutionL1,      OUTPUT);
     pinMode(resolutionL2,      OUTPUT);
@@ -383,5 +359,6 @@ void adjustSpeedScales() {
 }
 
 void loop(){
-  ros::spin();
+  ros::ServiceServer service = n.advertiseService("motorPose", positionMotors);
+  n.spinOnce();
 }

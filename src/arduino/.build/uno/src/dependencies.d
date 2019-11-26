@@ -1,4 +1,4 @@
-.build/uno/src/arduino.d .build/uno/src/arduino.o: .build/uno/src/arduino.cpp \
+.build/uno/src/arduino/arduino.d .build/uno/src/arduino/arduino.o: .build/uno/src/arduino/arduino.cpp \
  /usr/share/arduino/hardware/arduino/cores/arduino/Arduino.h \
  /usr/share/arduino/hardware/arduino/cores/arduino/binary.h \
  /usr/share/arduino/hardware/arduino/cores/arduino/WCharacter.h \
