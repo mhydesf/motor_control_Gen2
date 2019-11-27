@@ -10,26 +10,40 @@ to the Data Distributer upon service request.
 
 import sys
 import rospy
-from motor_control.srv import *
+from motor_control.srv import coordinatePass
 
-def requestCoordinate(request):
-    rospy.wait_for_service('coordinatePass')
-    try:
-        srvReq = rospy.ServiceProxy('coordinatePass', coordinatePass)
-        resp = srvReq(request)
-        return resp
-    except rospy.ServiceException, e:
-        rospy.loginfo('Service Call Failed: %s'%e)
+class dataHandler(object):
+    '''
+    Data Handler
+    '''
 
-def usage():
-    return '%s [req]'%sys.argv[0]
+    def requestCoordinate(self, request):
+        '''
+        Function Docstring
+        '''
+        rospy.wait_for_service('coordinatePass')
+        try:
+            srvReq = rospy.ServiceProxy('coordinatePass', coordinatePass)
+            resp = srvReq(request)
+            return resp
+        except rospy.ServiceException, error:
+            rospy.loginfo('Service Call Failed: %s'%error)
 
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        req = True
-    else:
-        print usage()
-    print "Requesting Coordinate ... "
-    coor = requestCoordinate(req)
-    print '[%s, %s, %s]'%(coor.xCoordinate, coor.yCoordinate, coor.zCoordinate)
-    
+    def usage(self):
+        '''
+        Function Docstring
+        '''
+        return '%s [req]'%sys.argv[0]
+
+    def client(self):
+        '''
+        Client Method
+        '''
+        if len(sys.argv) == 1:
+            req = True
+        else:
+            print self.usage()
+        print "Requesting Coordinate ... "
+        coor = self.requestCoordinate(req)
+        return coor.xCoordinate, coor.yCoordinate, coor.zCoordinate
+        

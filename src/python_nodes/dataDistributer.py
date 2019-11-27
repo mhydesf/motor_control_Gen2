@@ -46,7 +46,7 @@ class server(object):
         the routine over again
         '''
         if self.index < self.instructionCount - 1:
-            print("Index: %d"%self.index)
+            print 'Index: %d'%self.index
             self.index += 1
         else:
             self.index = 0

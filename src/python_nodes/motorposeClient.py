@@ -5,41 +5,31 @@ Commuinicates with arduino to control motors
 '''
 
 import rospy
-import actionlib
-from motor_control.msg import motorposeAction, motorposeGoal
+from motor_control.srv import motorPose, motorPoseRequest
+import dataHandler
 
-def feedbackCB(data):
-    '''
-    Returns the feedback received from the server
-    during motion.
-    '''
-    print 'Feedback received: %d'%data
-
-def callServer():
+def sendSteps(baseSteps, mainSteps, secSteps):
     '''
     Collect Data from Data Handler and
     Send to motorposeServer to control
     arm position
     '''
-    client = actionlib.SimpleActionClient('motorPoseClient', motorposeAction)
+    rospy.wait_for_service('motorPose')
 
-    client.wait_for_server()
+    client = rospy.ServiceProxy('motorPose', motorPose)
+    motorSteps = motorPoseRequest()
+    motorSteps.baseAng = baseSteps
+    motorSteps.mainAng = mainSteps
+    motorSteps.secAng = secSteps
+    #motorSteps.toolAng = toolSteps
 
-    goal = motorposeGoal()
-    goal.baseAngle = 8000
-    goal.mainAngle = 8000
-    goal.secAngle = 8000
-    goal.toolAngle = 8000
-
-    client.send_goal(goal, feedback_cb=feedbackCB)
-    client.wait_for_result()
-    result = client.get_result()
-
-    return result
+    print client(motorSteps)
 
 if __name__ == '__main__':
     try:
+        data = dataHandler.dataHandler()
+        steps = data.client()
         rospy.init_node('motorposeClient', anonymous=True)
-        callServer()
+        sendSteps(steps[0], steps[1], steps[2])
     except rospy.ROSInterruptException:
         pass
