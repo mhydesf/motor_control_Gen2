@@ -79,6 +79,7 @@ class server(object):
 
 if __name__ == '__main__':
     try:
+        print 'Server Running ... '
         rospy.init_node('coordinatePassSever')
         server = server("~/catkin_ws/src/motor_control_Gen2/src/testCoordinates.csv")
         server.runServer()

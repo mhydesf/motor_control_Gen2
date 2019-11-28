@@ -104,7 +104,7 @@ generate_messages(
 catkin_package(
   #INCLUDE_DIRS include
   LIBRARIES motor_control
-  CATKIN_DEPENDS message_generation message_runtime roscpp rospy std_msgs actionlib_msgs
+  CATKIN_DEPENDS message_generation message_runtime roscpp rospy std_msgs
   #DEPENDS system_lib
 )
 
