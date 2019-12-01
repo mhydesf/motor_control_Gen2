@@ -1,0 +1,14 @@
+
+
+
+
+
+.build/uno/src/arduino.cpp : src/arduino.ino
+	@mkdir -p .build/uno/src
+	@echo [93msrc/arduino.ino[0m
+	@/usr/local/bin/ino preproc  -o $@ $^
+
+
+all : .build/uno/src/arduino.cpp
+	@true
+

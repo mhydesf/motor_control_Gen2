@@ -121,7 +121,6 @@ class motorposeClient(object):
         Takes an x, y, z coordinate and returns all motor angles.
         '''
         self.vector.defineVector()
-        print self.vector.pvAng, self.vector.pvLength
         if self.vector.vectorCheck():
             baseAng = self.baseAngle()
             [mainAng, secAng, toolAng] = self.armAngles()
