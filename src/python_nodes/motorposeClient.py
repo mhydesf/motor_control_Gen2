@@ -121,6 +121,7 @@ class motorposeClient(object):
         Takes an x, y, z coordinate and returns all motor angles.
         '''
         self.vector.defineVector()
+        print self.vector.pvAng, self.vector.pvLength
         if self.vector.vectorCheck():
             baseAng = self.baseAngle()
             [mainAng, secAng, toolAng] = self.armAngles()
@@ -140,10 +141,10 @@ class motorposeClient(object):
 
         client = rospy.ServiceProxy('motorPose', motorPose)
         motorSteps = motorPoseRequest()
-        [motorSteps.baseAng, motorSteps.mainAng, \
-            motorSteps.secAng, motorSteps.toolAng] = self.genAngles()
+        motorSteps.baseAng, motorSteps.mainAng, \
+            motorSteps.secAng, motorSteps.toolAng = self.genAngles()
 
-        print client(motorSteps)
+        client(motorSteps)
 
 ############################################################
 ############################################################
@@ -166,11 +167,14 @@ def coordinateErrorMsg():
 
     '''
 
+############################################################
+############################################################
+############################################################
+
 if __name__ == '__main__':
     rospy.init_node('motorPoseClient')
     try:
         mpClient = motorposeClient()
         mpClient.sendSteps()
-        print mpClient.armAngles()
     except rospy.ROSInterruptException:
         pass
