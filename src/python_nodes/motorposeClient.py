@@ -6,6 +6,7 @@ Commuinicates with arduino to control motors
 
 from math import pi, atan, atan2, acos, sqrt
 import rospy
+import serial
 from motor_control.srv import motorPose, motorPoseRequest
 import dataHandler
 
@@ -69,6 +70,7 @@ class motorposeClient(object):
     def __init__(self):
         self.vector = positionVector()
         self.request = motorPoseRequest()
+        self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
         self.mainArmLength = 7
         self.secArmLength = 4
 
@@ -145,6 +147,9 @@ class motorposeClient(object):
 
         client(motorSteps)
 
+    def sendStepsNONROS(self):
+        self.ser.open()
+
 ############################################################
 ############################################################
 ############################################################
@@ -174,6 +179,6 @@ if __name__ == '__main__':
     rospy.init_node('motorPoseClient')
     try:
         mpClient = motorposeClient()
-        mpClient.sendSteps()
+        mpClient.sendStepsNONROS()
     except rospy.ROSInterruptException:
         pass
