@@ -6,7 +6,7 @@ Commuinicates with arduino to control motors
 
 from math import pi, atan, atan2, acos, sqrt
 import rospy
-from motor_control.srv import motorPose, motorPoseRequest
+import serial
 import dataHandler
 
 ############################################################
@@ -68,7 +68,7 @@ class motorposeClient(object):
     '''
     def __init__(self):
         self.vector = positionVector()
-        self.request = motorPoseRequest()
+        self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=3)
         self.mainArmLength = 7
         self.secArmLength = 4
 
@@ -130,20 +130,21 @@ class motorposeClient(object):
             [mainAng, secAng, toolAng] = [0, 0, 0]
         return [baseAng, mainAng, secAng, toolAng]
 
-    def sendSteps(self):
+    def sendStepsArduino(self):
         '''
-        Collect Data from Data Handler and
-        Send to motorposeServer to control
-        arm position
+        Sends each motors steps to arduino upon
+        request. Waits for messsage from arduino
+        to grab, convert, and send the next
+        coordinate.
         '''
-        rospy.wait_for_service('motorPose')
+        self.ser.write('2000')
+        print 'Wrote Data'
 
-        client = rospy.ServiceProxy('motorPose', motorPose)
-        motorSteps = motorPoseRequest()
-        motorSteps.baseAng, motorSteps.mainAng, \
-            motorSteps.secAng, motorSteps.toolAng = self.genAngles()
-
-        client(motorSteps)
+    def closePort(self):
+        '''
+        Closes serial port
+        '''
+        self.ser.close()
 
 ############################################################
 ############################################################
@@ -170,10 +171,10 @@ def coordinateErrorMsg():
 ############################################################
 ############################################################
 
+import time
+
 if __name__ == '__main__':
     rospy.init_node('motorPoseClient')
-    try:
-        mpClient = motorposeClient()
-        mpClient.sendSteps()
-    except rospy.ROSInterruptException:
-        pass
+
+    mpClient = motorposeClient()
+    mpClient.sendStepsArduino()

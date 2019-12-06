@@ -32,13 +32,8 @@
 
 #define NUM_STEPPERS 4
 
-#include <ros.h>
-#include <motor_control/motorPose.h>
-
-ros::NodeHandle  nh;
-using motor_control::motorPose;
-
-motor_control::motorPose poseMsg;
+char arduinoReady = '1';
+char arduinoBusy  = '0';
 
 struct stepperInfo {
   float acceleration;
@@ -64,24 +59,28 @@ struct stepperInfo {
   volatile unsigned int stepCount;
 };
 
-void positionMotors(const motorPose::Request & req, motorPose::Response & res){
-    delay(250);
+void positionMotors(){
 
-    prepareMovement(0, req.baseAng);
-    prepareMovement(1, req.mainAng);
-    prepareMovement(2, req.secAng);
-    prepareMovement(3, req.toolAng);
-    runAndWait();
+    while (Serial.available() == 0){/* Do Nothing */}
+    while (Serial.available() > 0){
+      float baseAng = Serial.parseFloat();
+
+      prepareMovement(0, baseAng);
+      prepareMovement(1, baseAng);
+      prepareMovement(2, baseAng);
+      prepareMovement(3, baseAng);
+      
+      runAndWait();
+      delay(50);
+    }
+
 }
-
-ros::ServiceServer<motorPose::Request, motorPose::Response> server("motorPose",&positionMotors);
 
 volatile stepperInfo steppers[NUM_STEPPERS];
 
 void setup(){
 
-    nh.initNode();
-    nh.advertiseService(server);
+    Serial.begin(115200);
 
     pinMode(resolutionL1,      OUTPUT);
     pinMode(resolutionL2,      OUTPUT);
@@ -113,28 +112,29 @@ void setup(){
 
     steppers[0].dirFunc = baseDir;
     steppers[0].stepFunc = baseStep;
-    steppers[0].acceleration = 1500;
-    steppers[0].minStepInterval = 1000;
+    steppers[0].acceleration = 1000;
+    steppers[0].minStepInterval = 50;
 
     steppers[1].dirFunc = mainDir;
     steppers[1].stepFunc = mainStep;
-    steppers[1].acceleration = 1500;
-    steppers[1].minStepInterval = 1000;
+    steppers[1].acceleration = 1000;
+    steppers[1].minStepInterval = 50;
 
     steppers[2].dirFunc = secDir;
     steppers[2].stepFunc = secStep;
-    steppers[2].acceleration = 1500;
-    steppers[2].minStepInterval = 1000;
+    steppers[2].acceleration = 1000;
+    steppers[2].minStepInterval = 50;
 
     steppers[3].dirFunc = toolDir;
     steppers[3].stepFunc = toolStep;
-    steppers[3].acceleration = 1500;
-    steppers[3].minStepInterval = 1000;
+    steppers[3].acceleration = 1000;
+    steppers[3].minStepInterval = 50;
 }
 
 void loop()
 {
-  nh.spinOnce();
+  Serial.write(arduinoReady);
+  positionMotors();
 }
 
 void baseStep(){
