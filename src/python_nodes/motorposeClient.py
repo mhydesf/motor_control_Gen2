@@ -68,7 +68,7 @@ class motorposeClient(object):
     '''
     def __init__(self):
         self.vector = positionVector()
-        self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=3)
+        self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
         self.mainArmLength = 7
         self.secArmLength = 4
 
@@ -171,10 +171,13 @@ def coordinateErrorMsg():
 ############################################################
 ############################################################
 
-import time
-
 if __name__ == '__main__':
     rospy.init_node('motorPoseClient')
-
     mpClient = motorposeClient()
-    mpClient.sendStepsArduino()
+
+    while True:
+        userInput = raw_input("Do you want to send data ... [Y/n]:  ")
+        if userInput.upper() == 'Y':
+            mpClient.sendStepsArduino()
+        if userInput == 'end':
+            break

@@ -1,7 +1,7 @@
-#define resolutionL1        2
-#define resolutionL2        3
-#define resolutionR1        8
-#define resolutionR2        9
+#define resolutionL1        2     //Base And Main Step Resolution Pin1
+#define resolutionL2        3     //Base And Main Step Resolution Pin2
+#define resolutionR1        8     //Sec. And Tool Step Resolution Pin1
+#define resolutionR2        9     //Sec. And Tool Step Resolution Pin2
 
 #define baseStepPin         4
 #define baseDirPin          5
@@ -15,20 +15,20 @@
 #define toolStepPin         12
 #define toolDirPin          13
 
-#define baseStepH           PORTD |=  0b00010000;
-#define baseStepL           PORTD &= ~0b00010000;
+#define baseStepH           PORTD |=  0b00010000;     //Writing to Register to Turn 4 High
+#define baseStepL           PORTD &= ~0b00010000;     //Writing to Register to Turn 4 Low
 
-#define mainStepH           PORTD |=  0b01000000;
-#define mainStepL           PORTD &= ~0b01000000;
+#define mainStepH           PORTD |=  0b01000000;     //Writing to Register to Turn 6 High
+#define mainStepL           PORTD &= ~0b01000000;     //Writing to Register to Turn 6 Low
 
-#define secStepH            PORTB |=  0b00000100;
-#define secStepL            PORTB &= ~0b00000100;
+#define secStepH            PORTB |=  0b00000100;     //Writing to Register to Turn 10 High
+#define secStepL            PORTB &= ~0b00000100;     //Writing to Register to Turn 10 Low
 
-#define toolStepH           PORTB |=  0b00010000;
-#define toolStepL           PORTB &= ~0b00010000;
+#define toolStepH           PORTB |=  0b00010000;     //Writing to Register to Turn 12 High
+#define toolStepL           PORTB &= ~0b00010000;     //Writing to Register to Turn 12 Low
 
-#define TIMER1_INTERRUPTS_ON    TIMSK1 |=  (1 << OCIE1A);
-#define TIMER1_INTERRUPTS_OFF   TIMSK1 &= ~(1 << OCIE1A);
+#define TIMER1_INTERRUPTS_ON    TIMSK1 |=  (1 << OCIE1A);     //Macro for enabling timer interrupts
+#define TIMER1_INTERRUPTS_OFF   TIMSK1 &= ~(1 << OCIE1A);     //Macro for disabling time interrupts
 
 #define NUM_STEPPERS 4
 
@@ -36,8 +36,8 @@ char arduinoReady = '1';
 char arduinoBusy  = '0';
 
 struct stepperInfo {
-  float acceleration;
-  volatile unsigned long minStepInterval;
+  float acceleration;                       //Desired Acceleration of Motor
+  volatile unsigned long minStepInterval;   //Max RPM observed as pulse interval
   void (*dirFunc)(int);
   void (*stepFunc)();
 
