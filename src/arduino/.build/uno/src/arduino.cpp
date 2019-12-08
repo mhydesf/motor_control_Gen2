@@ -1,3 +1,24 @@
+#include <Arduino.h>
+
+void positionMotors();
+void setup();
+void loop();
+void baseStep();
+void baseDir(int dir);
+void mainStep();
+void mainDir(int dir);
+void secStep();
+void secDir(int dir);
+void toolStep();
+void toolDir(int dir);
+void resetStepperInfo(struct stepperInfo& si);
+void resetStepper(volatile struct stepperInfo& si);
+float getDurationOfAcceleration(volatile stepperInfo& s, unsigned int numSteps);
+void prepareMovement(int whichMotor, long steps);
+void setNextInterruptInterval();
+void runAndWait();
+void adjustSpeedScales();
+#line 1 "src/arduino.ino"
 #define resolutionL1        2     //Base And Main Step Resolution Pin1
 #define resolutionL2        3     //Base And Main Step Resolution Pin2
 #define resolutionR1        8     //Sec. And Tool Step Resolution Pin1
