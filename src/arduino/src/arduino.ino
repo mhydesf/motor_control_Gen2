@@ -59,20 +59,21 @@ struct stepperInfo {
   volatile unsigned int stepCount;
 };
 
+int baseAng = 2000;
+
 void positionMotors(){
 
-    while (Serial.available() == 0){/* Do Nothing */}
-    while (Serial.available() > 0){
-      float baseAng = Serial.parseFloat();
-
-      prepareMovement(0, baseAng);
-      prepareMovement(1, baseAng);
-      prepareMovement(2, baseAng);
-      prepareMovement(3, baseAng);
-      
-      runAndWait();
-      delay(50);
-    }
+    prepareMovement(0, baseAng);
+    prepareMovement(1, baseAng);
+    prepareMovement(2, baseAng);
+    prepareMovement(3, baseAng);
+    
+    runAndWait();
+    prepareMovement(0, -1 * baseAng);
+    prepareMovement(1, -1 * baseAng);
+    prepareMovement(2, -1 * baseAng);
+    prepareMovement(3, -1 * baseAng);
+    runAndWait();
 
 }
 
@@ -80,7 +81,7 @@ volatile stepperInfo steppers[NUM_STEPPERS];
 
 void setup(){
 
-    Serial.begin(115200);
+    //Serial.begin(115200);
 
     pinMode(resolutionL1,      OUTPUT);
     pinMode(resolutionL2,      OUTPUT);
