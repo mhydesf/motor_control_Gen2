@@ -5,7 +5,6 @@ Commuinicates with arduino to control motors
 '''
 
 from math import pi, atan2, acos
-from positionVector import positionVector
 
 class dataConverter(object):
     '''
@@ -15,8 +14,8 @@ class dataConverter(object):
     Then the data is sent to the arduino action server
     to move the motors.
     '''
-    def __init__(self):
-        self.vector = positionVector()
+    def __init__(self, positionVector):
+        self.vector = positionVector
         self.mainArmLength = 7
         self.secArmLength = 4
 
@@ -64,7 +63,7 @@ class dataConverter(object):
         toolAng = 180 - angleRemainder - self.vector.pvAng
         return mainDegFromZ, secAng, toolAng
 
-    def genAngles(self):
+    def returnAngles(self):
         '''
         Takes an x, y, z coordinate and returns all motor angles.
         '''
@@ -77,6 +76,16 @@ class dataConverter(object):
             baseAng = 0
             [mainAng, secAng, toolAng] = [0, 0, 0]
         return [baseAng, mainAng, secAng, toolAng]
+
+    def returnSteps(self):
+        '''
+        Takes an x, y, z coordinate and returns all motor angles.
+        '''
+        angles = self.returnAngles()
+        steps = []
+        for angle in angles:
+            steps.append(int(angle / (1.8 / 4)))
+        return steps
 
 ############################################################
 ############################################################
