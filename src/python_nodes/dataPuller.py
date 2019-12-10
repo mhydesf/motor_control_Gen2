@@ -12,7 +12,7 @@ import sys
 import rospy
 from motor_control.srv import coordinatePass
 
-class dataHandler(object):
+class dataPuller(object):
     '''
     Data Handler
     '''

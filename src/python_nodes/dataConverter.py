@@ -4,61 +4,10 @@
 Commuinicates with arduino to control motors
 '''
 
-from math import pi, atan, atan2, acos, sqrt
-import rospy
-import serial
-import dataHandler
+from math import pi, atan2, acos
+from positionVector import positionVector
 
-############################################################
-############################################################
-############################################################
-
-class positionVector(object):
-    '''
-    Properties of the vector defining the destination
-    of the arm.
-    '''
-    def __init__(self):
-        self.dataHandler = dataHandler.dataHandler()
-        self.xCoor = 0
-        self.yCoor = 0
-        self.zCoor = 0
-        self.pvAng = 0
-        self.pvLength = 0
-        self.pullCoor()
-
-    def pullCoor(self):
-        '''
-        Pulls the coordinate from the current index
-        of the dataDistributer (which is also in charge
-        of tracking the current index).
-        '''
-        [self.xCoor, self.yCoor, self.zCoor] = self.dataHandler.client()
-
-    def vectorCheck(self):
-        '''
-        Returns True if the arm can achieve the components of the position vector. This will also
-        avoid any runtime errors of calculating undefined values. The domain is determined by
-        the length of the arms.
-        '''
-        comparisonValue = sqrt(self.xCoor**2 + self.yCoor**2 + self.zCoor**2)
-        return 2 <= comparisonValue <= 10
-
-    def defineVector(self):
-        '''
-        Input the x, y, z coordinate of the desired poisiton and the necessary components of that
-        vector will be calculated and returned. xPrime describes the horizontal length of the 2D
-        vector residing in the plane already achieved by rotating the base.
-        '''
-        xPrime = sqrt(self.xCoor**2 + self.yCoor**2)
-        self.pvAng = (atan(self.zCoor / xPrime)) * 180 / pi
-        self.pvLength = sqrt(xPrime**2 + self.zCoor**2)
-
-############################################################
-############################################################
-############################################################
-
-class motorposeClient(object):
+class dataConverter(object):
     '''
     This client is joined with the dataHandler client.
     Coordinates are pulled from the dataDistributer
@@ -68,7 +17,6 @@ class motorposeClient(object):
     '''
     def __init__(self):
         self.vector = positionVector()
-        self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=3)
         self.mainArmLength = 7
         self.secArmLength = 4
 
@@ -130,22 +78,6 @@ class motorposeClient(object):
             [mainAng, secAng, toolAng] = [0, 0, 0]
         return [baseAng, mainAng, secAng, toolAng]
 
-    def sendStepsArduino(self):
-        '''
-        Sends each motors steps to arduino upon
-        request. Waits for messsage from arduino
-        to grab, convert, and send the next
-        coordinate.
-        '''
-        self.ser.write('2000')
-        print 'Wrote Data'
-
-    def closePort(self):
-        '''
-        Closes serial port
-        '''
-        self.ser.close()
-
 ############################################################
 ############################################################
 ############################################################
@@ -170,14 +102,3 @@ def coordinateErrorMsg():
 ############################################################
 ############################################################
 ############################################################
-
-if __name__ == '__main__':
-    rospy.init_node('motorPoseClient')
-    mpClient = motorposeClient()
-
-    while True:
-        userInput = raw_input("Do you want to send data ... [Y/n]:  ")
-        if userInput.upper() == 'Y':
-            mpClient.sendStepsArduino()
-        if userInput == 'end':
-            break
