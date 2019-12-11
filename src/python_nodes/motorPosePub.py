@@ -26,6 +26,8 @@ class motorPosePub(object):
         self.secAng = 0
         self.toolAng = 0
 
+        rospy.spin()
+        
     def updatePosition(self):
         '''
         Requests the next coordinate from the data
@@ -76,4 +78,3 @@ class motorPosePub(object):
 if __name__ == '__main__':
     rospy.init_node('motorPosePub', anonymous=True)
     pub = motorPosePub()
-    pub.publishSteps()
