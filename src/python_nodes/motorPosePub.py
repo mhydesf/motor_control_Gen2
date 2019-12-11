@@ -19,7 +19,8 @@ class motorPosePub(object):
         self.positionVector = positionVector()
         self.dataConverter = dataConverter(self.positionVector)
         self.msg = motorSteps()
-        self.stepPub = rospy.Publisher('motorPoseSteps', motorSteps, queue_size=10)
+
+        self.poseSub = rospy.Subscriber('arduinoState', Bool, self.arduinoStateCallback)
 
         self.baseAng = 0
         self.mainAng = 0
@@ -27,7 +28,7 @@ class motorPosePub(object):
         self.toolAng = 0
 
         rospy.spin()
-        
+
     def updatePosition(self):
         '''
         Requests the next coordinate from the data
@@ -55,6 +56,7 @@ class motorPosePub(object):
         '''
         Updates coordinate when Arduino is ready.
         '''
+
         if arduinoState:
             self.updatePosition()
             self.defineSteps()
@@ -68,11 +70,11 @@ class motorPosePub(object):
         Publishes the steps to the motorPoseSteps topic
         for the arduino to read.
         '''
+        stepPub = rospy.Publisher('motorPoseSteps', motorSteps, queue_size=10)
         rate = rospy.Rate(2)
         while not rospy.is_shutdown():
-            self.stepPub.publish(self.msg)
+            stepPub.publish(self.msg)
             rospy.loginfo(self.msg)
-            rospy.Subscriber('arduinoState', Bool, self.arduinoStateCallback)
             rate.sleep()
 
 if __name__ == '__main__':
