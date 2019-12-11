@@ -18,4 +18,3 @@ while not rospy.is_shutdown():
     msg.data = False
     publisher.publish(msg)
     time.sleep(5)
-    
