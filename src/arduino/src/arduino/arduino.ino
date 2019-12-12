@@ -63,10 +63,10 @@ ros::NodeHandle  node;
 
 //Subscriber Callback Function
 void messageCallback(motor_control::motorSteps &stepMsg){
-    steppers[0].goalPosition = stepMsg.baseSteps;
-    steppers[1].goalPosition = stepMsg.mainSteps;
-    steppers[2].goalPosition = stepMsg.secSteps;
-    steppers[3].goalPosition = stepMsg.toolSteps;
+    steppers[0].goalPosition = stepMsg.baseStep;
+    steppers[1].goalPosition = stepMsg.mainStep;
+    steppers[2].goalPosition = stepMsg.secStep;
+    steppers[3].goalPosition = stepMsg.toolStep;
 }
 
 //Define ROS Subscriber
@@ -124,7 +124,7 @@ void setup(){
 //Arduino Main Loop
 void loop(){
     node.spinOnce();
-    dealy(1);
+    delay(1);
 }
 
 void baseStep(){

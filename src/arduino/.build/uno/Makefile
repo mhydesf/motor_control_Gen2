@@ -191,11 +191,11 @@ include .build/uno/ros_lib/time.d
 
 
 
-.build/uno/src/arduino.o : .build/uno/src/arduino.cpp
-	@echo [93msrc/arduino.cpp[0m
-	@mkdir -p .build/uno/src
-	@/usr/share/arduino/hardware/tools/avr/bin/avr-g++ -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=105 -I/usr/share/arduino/hardware/arduino/cores/arduino -ffunction-sections -fdata-sections -g -Os -w -I/usr/share/arduino/hardware/arduino/variants/standard -I/usr/share/arduino/hardware/arduino/cores/arduino -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc -Ilib/ros_lib -Ilib/ros_lib/roscpp -Ilib/ros_lib/pcl_msgs -Ilib/ros_lib/map_msgs -Ilib/ros_lib/topic_tools -Ilib/ros_lib/dynamic_reconfigure -Ilib/ros_lib/actionlib -Ilib/ros_lib/stereo_msgs -Ilib/ros_lib/rosgraph_msgs -Ilib/ros_lib/nav_msgs -Ilib/ros_lib/ros_essentials_cpp -Ilib/ros_lib/smach_msgs -Ilib/ros_lib/sensor_msgs -Ilib/ros_lib/motors -Ilib/ros_lib/laser_assembler -Ilib/ros_lib/actionlib_tutorials -Ilib/ros_lib/actionlib_msgs -Ilib/ros_lib/turtle_actionlib -Ilib/ros_lib/std_msgs -Ilib/ros_lib/polled_camera -Ilib/ros_lib/rospy_tutorials -Ilib/ros_lib/geometry_msgs -Ilib/ros_lib/trajectory_msgs -Ilib/ros_lib/nodelet -Ilib/ros_lib/diagnostic_msgs -Ilib/ros_lib/tf -Ilib/ros_lib/roscpp_tutorials -Ilib/ros_lib/gazebo_msgs -Ilib/ros_lib/motor_control -Ilib/ros_lib/tests -Ilib/ros_lib/theora_image_transport -Ilib/ros_lib/visualization_msgs -Ilib/ros_lib/tf2_msgs -Ilib/ros_lib/control_toolbox -Ilib/ros_lib/shape_msgs -Ilib/ros_lib/controller_manager_msgs -Ilib/ros_lib/rosserial_arduino -Ilib/ros_lib/control_msgs -Ilib/ros_lib/bond -Ilib/ros_lib/std_srvs -Ilib/ros_lib/rosserial_msgs -Ilib/ros_lib/ros -Ilib/ros_lib/turtlesim -Ilib/ros_lib/tests/float64_test -Ilib/ros_lib/tests/array_test -Ilib/ros_lib/tests/time_test -fno-exceptions -iquote src  -o $@ -c .build/uno/src/arduino.cpp
-include .build/uno/src/arduino.d
+.build/uno/src/arduino/arduino.o : .build/uno/src/arduino/arduino.cpp
+	@echo [93msrc/arduino/arduino.cpp[0m
+	@mkdir -p .build/uno/src/arduino
+	@/usr/share/arduino/hardware/tools/avr/bin/avr-g++ -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=105 -I/usr/share/arduino/hardware/arduino/cores/arduino -ffunction-sections -fdata-sections -g -Os -w -I/usr/share/arduino/hardware/arduino/variants/standard -I/usr/share/arduino/hardware/arduino/cores/arduino -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc -Ilib/ros_lib -Ilib/ros_lib/roscpp -Ilib/ros_lib/pcl_msgs -Ilib/ros_lib/map_msgs -Ilib/ros_lib/topic_tools -Ilib/ros_lib/dynamic_reconfigure -Ilib/ros_lib/actionlib -Ilib/ros_lib/stereo_msgs -Ilib/ros_lib/rosgraph_msgs -Ilib/ros_lib/nav_msgs -Ilib/ros_lib/ros_essentials_cpp -Ilib/ros_lib/smach_msgs -Ilib/ros_lib/sensor_msgs -Ilib/ros_lib/motors -Ilib/ros_lib/laser_assembler -Ilib/ros_lib/actionlib_tutorials -Ilib/ros_lib/actionlib_msgs -Ilib/ros_lib/turtle_actionlib -Ilib/ros_lib/std_msgs -Ilib/ros_lib/polled_camera -Ilib/ros_lib/rospy_tutorials -Ilib/ros_lib/geometry_msgs -Ilib/ros_lib/trajectory_msgs -Ilib/ros_lib/nodelet -Ilib/ros_lib/diagnostic_msgs -Ilib/ros_lib/tf -Ilib/ros_lib/roscpp_tutorials -Ilib/ros_lib/gazebo_msgs -Ilib/ros_lib/motor_control -Ilib/ros_lib/tests -Ilib/ros_lib/theora_image_transport -Ilib/ros_lib/visualization_msgs -Ilib/ros_lib/tf2_msgs -Ilib/ros_lib/control_toolbox -Ilib/ros_lib/shape_msgs -Ilib/ros_lib/controller_manager_msgs -Ilib/ros_lib/rosserial_arduino -Ilib/ros_lib/control_msgs -Ilib/ros_lib/bond -Ilib/ros_lib/std_srvs -Ilib/ros_lib/rosserial_msgs -Ilib/ros_lib/ros -Ilib/ros_lib/turtlesim -Ilib/ros_lib/tests/float64_test -Ilib/ros_lib/tests/array_test -Ilib/ros_lib/tests/time_test -fno-exceptions -iquote src/arduino  -o $@ -c .build/uno/src/arduino/arduino.cpp
+include .build/uno/src/arduino/arduino.d
 
 
 
@@ -203,7 +203,7 @@ include .build/uno/src/arduino.d
 
 
 
-.build/uno/firmware.elf : .build/uno/src/arduino.o .build/uno/arduino/libarduino.a .build/uno/ros_lib/libros_lib.a
+.build/uno/firmware.elf : .build/uno/src/arduino/arduino.o .build/uno/arduino/libarduino.a .build/uno/ros_lib/libros_lib.a
 	@echo [92mLinking firmware.elf[0m
 	@/usr/share/arduino/hardware/tools/avr/bin/avr-gcc -mmcu=atmega328p -Wl,-Os -Wl,--gc-sections -o $@ $^ -lm
 

@@ -45,8 +45,8 @@ class server(object):
         and sets the index back to 0 to start
         the routine over again
         '''
+        print 'Index: %d'%self.index
         if self.index < self.instructionCount - 1:
-            print 'Index: %d'%self.index
             self.index += 1
         else:
             self.index = 0
@@ -65,7 +65,7 @@ class server(object):
 
             self.checkIndex()
 
-            return resp
+        return resp
 
     def runServer(self):
         '''
@@ -76,11 +76,11 @@ class server(object):
         self.countInstructions()
         rospy.Service('coordinatePass', coordinatePass, self.handleRequest)
         rospy.spin()
-
-try:
-    print 'Server Running ... '
-    rospy.init_node('coordinatePassSever')
-    server = server("~/catkin_ws/src/motor_control_Gen2/src/testCoordinates.csv")
-    server.runServer()
-except rospy.ROSInterruptException():
-    pass
+if __name__ == '__main__':
+    try:
+        print 'Server Running ... '
+        rospy.init_node('coordinatePassSever')
+        serv = server("~/catkin_ws/src/motor_control_Gen2/src/testCoordinates.csv")
+        serv.runServer()
+    except rospy.ROSInterruptException():
+        pass
