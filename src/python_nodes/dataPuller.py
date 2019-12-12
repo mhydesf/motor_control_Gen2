@@ -14,7 +14,9 @@ from motor_control.srv import coordinatePass
 
 class dataPuller(object):
     '''
-    Data Handler
+    Actual Client for the /coordinatePass Service.
+    Perpetually pulls coordinates from the dataFrame
+    and feeds them to the motorPosePublisher
     '''
 
     def requestCoordinate(self, request):
@@ -31,13 +33,13 @@ class dataPuller(object):
 
     def usage(self):
         '''
-        Function Docstring
+        Simple Error Check in Client Request
         '''
         return '%s [req]'%sys.argv[0]
 
     def client(self):
         '''
-        Client Method
+        Client Implementation
         '''
         if len(sys.argv) == 1:
             req = True

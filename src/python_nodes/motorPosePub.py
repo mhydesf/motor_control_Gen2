@@ -1,7 +1,13 @@
 #!/home/mhyde/vEnvs/rosPy/bin/python
 
 '''
-Publisher Method for Data Distribution
+node = /motorPosePub
+pubTopic = /motorPoseSteps
+subTopic = /arduinoState
+
+Listens to arduino for ready state then implements
+other methods to pull and convert the next coordinate
+into the respective arm angles and steps.
 '''
 
 import rospy

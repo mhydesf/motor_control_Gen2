@@ -1,18 +1,21 @@
 #!/home/mhyde/vEnvs/rosPy/bin/python
 
 '''
-Commuinicates with arduino to control motors
+Client
+
+Service = /coordinatePass
+
+Object incorporated in dataPuller Client which takes
+an XYZ coordiante from the data frame and coverts into
+steps and angles for each of the four motors.
 '''
 
 from math import pi, atan2, acos
 
 class dataConverter(object):
     '''
-    This client is joined with the dataHandler client.
-    Coordinates are pulled from the dataDistributer
-    and converted into steps for each motor in the arm.
-    Then the data is sent to the arduino action server
-    to move the motors.
+    Consists of math utils for the /coordinatePass
+    Service. Integrated into Service Client.
     '''
     def __init__(self, positionVector):
         self.vector = positionVector
@@ -107,7 +110,3 @@ def coordinateErrorMsg():
 
 
     '''
-
-############################################################
-############################################################
-############################################################
