@@ -63,13 +63,13 @@ class motorPosePub(object):
         Updates coordinate when Arduino is ready.
         '''
 
-        if arduinoState:
+        if arduinoState.data:
             self.updatePosition()
             self.defineSteps()
             self.defineAngles()
             self.publishSteps()
         else:
-            print 'something ... '
+            pass
 
     def publishSteps(self):
         '''
@@ -77,11 +77,8 @@ class motorPosePub(object):
         for the arduino to read.
         '''
         stepPub = rospy.Publisher('motorPoseSteps', motorSteps, queue_size=10)
-        rate = rospy.Rate(2)
-        while not rospy.is_shutdown():
-            stepPub.publish(self.msg)
-            rospy.loginfo(self.msg)
-            rate.sleep()
+        stepPub.publish(self.msg)
+        rospy.loginfo(self.msg)
 
 if __name__ == '__main__':
     rospy.init_node('motorPosePub', anonymous=True)

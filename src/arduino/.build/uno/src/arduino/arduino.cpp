@@ -1,3 +1,9 @@
+#include <Arduino.h>
+#include "ros.h"
+#include "motor_control/motorSteps.h"
+void setup();
+void loop();
+#line 1 "src/arduino/arduino.ino"
 /*
 ROSserial_Arduino Node for the 4 DOF Robotic Arm Motor_Control
 ROS Package. Hosts a publisher to /arduinoState and a subscriber
@@ -42,8 +48,8 @@ the next position.
 
 #define NumSteppers         4     //Number of Steppers in System
 
-#include "ros.h"
-#include "motor_control/motorSteps.h"
+//#include "ros.h"
+//#include "motor_control/motorSteps.h"
 
 //Define ROS Node
 ros::NodeHandle  node;
@@ -132,6 +138,7 @@ void loop(){
     delay(1);
 }
 
+/*
 void baseStep(){
     baseStepH
     baseStepL
@@ -178,3 +185,4 @@ void setDirection(){
         }
     }
 }
+*/
