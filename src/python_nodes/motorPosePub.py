@@ -27,6 +27,7 @@ class motorPosePub(object):
         self.msg = motorSteps()
 
         self.poseSub = rospy.Subscriber('arduinoState', Bool, self.arduinoStateCallback)
+        self.stepPub = rospy.Publisher('motorPoseSteps', motorSteps, queue_size=10)
 
         self.baseAng = 0
         self.mainAng = 0
@@ -76,8 +77,7 @@ class motorPosePub(object):
         Publishes the steps to the motorPoseSteps topic
         for the arduino to read.
         '''
-        stepPub = rospy.Publisher('motorPoseSteps', motorSteps, queue_size=10)
-        stepPub.publish(self.msg)
+        self.stepPub.publish(self.msg)
         rospy.loginfo(self.msg)
 
 if __name__ == '__main__':

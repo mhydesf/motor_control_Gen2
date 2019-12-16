@@ -42,27 +42,12 @@ the next position.
 
 #define NumSteppers         4     //Number of Steppers in System
 
-#include "ros.h"
-#include "motor_control/motorSteps.h"
-
-//Define ROS Node
-ros::NodeHandle  node;
-
-//Subscriber Callback Function
-void messageCallback(motor_control::motorSteps &stepMsg){
-    steppers[0].goalPosition = stepMsg.baseStep;
-    steppers[1].goalPosition = stepMsg.mainStep;
-    steppers[2].goalPosition = stepMsg.secStep;
-    steppers[3].goalPosition = stepMsg.toolStep;
-}
-
-//Define ROS Subscriber
-ros::Subscriber<motor_control::motorSteps> sub("motorPoseSteps", &messageCallback);
-
 //Stepper Structure
 struct StepperDef{
     void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: High/Low)
     void (*stepFunc)();         //Discrete Step Function
+
+    int stepInc = 1;            //Counts step (+/-) 1
 
     long previousPosition;      //Position in Steps before more started
     long currentPosition;       //Position in Steps per discrete motion
@@ -72,10 +57,23 @@ struct StepperDef{
 //List of Steppers defined as a list of length 4
 volatile StepperDef steppers[NumSteppers];
 
+#include <ros.h>
+#include <motor_control/motorSteps.h>
 
-//Arduino Setup Function. Run Once upon upload and reset
+ros::NodeHandle  node;
+
+void messageCb(motor_control::motorSteps &msg){
+    steppers[0].goalPosition = msg.baseStep;
+    steppers[1].goalPosition = msg.mainStep;
+    steppers[2].goalPosition = msg.secStep;
+    steppers[3].goalPosition = msg.toolStep;
+    positionMotors();
+}
+
+ros::Subscriber<motor_control::motorSteps> sub("motorPoseSteps", &messageCb );
+
 void setup(){
-
+    
     //Setting Pin Modes
     pinMode(resolutionL1,      OUTPUT);
     pinMode(resolutionL2,      OUTPUT);
@@ -121,7 +119,6 @@ void setup(){
     steppers[3].previousPosition    = 0;
     steppers[3].goalPosition        = 0;
 
-    //Initializing the ROS Node
     node.initNode();
     node.subscribe(sub);
 }
@@ -171,10 +168,39 @@ void toolDir(int dir){
 void setDirection(){
     for (int i = 0; i < 4; i++){
         if (steppers[i].goalPosition < steppers[i].currentPosition){
-            steppers[i].dirFunc(1);
+            steppers[i].dirFunc(0);
+            steppers[i].stepInc = -1;
         }
         else{
-            steppers[i].dirFunc(0);
+            steppers[i].dirFunc(1);
+            steppers[i].stepInc = 1;
         }
     }
+}
+
+int maxStepFunc(){
+    int maxVal = 0;
+ 
+    for ( int i = 0; i < 4; i++){
+        if ( steppers[i].goalPosition > maxVal){
+            maxVal = steppers[i].goalPosition;
+        }
+    }
+    
+    return maxVal;
+}
+
+void positionMotors(){
+    setDirection();
+    int maxStep;
+    while (maxStep > 0){
+        for (int i = 0; i < 4; i++){
+            if (steppers[i].currentPosition < abs(steppers[i].goalPosition)){
+                steppers[i].stepFunc();
+                steppers[i].currentPosition += steppers[i].stepInc;
+            }
+        }
+        maxStep -= 1;
+    }
+    delay(1);
 }

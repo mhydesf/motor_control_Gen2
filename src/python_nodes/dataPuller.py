@@ -41,6 +41,7 @@ class dataPuller(object):
         '''
         Client Implementation
         '''
+        req = False
         if len(sys.argv) == 1:
             req = True
         else:
