@@ -1,6 +1,4 @@
 <launch>
-
     <node name="dataFrame" pkg="motor_control" type="dataFrame.py"/>
     <node name="motorPosePub" pkg="motor_control" type="motorPosePub.py"/>
-
 </launch>

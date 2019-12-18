@@ -67,10 +67,12 @@ void messageCb(motor_control::motorSteps &msg){
     steppers[1].goalPosition = msg.mainStep;
     steppers[2].goalPosition = msg.secStep;
     steppers[3].goalPosition = msg.toolStep;
-    positionMotors();
 }
 
 ros::Subscriber<motor_control::motorSteps> sub("motorPoseSteps", &messageCb );
+
+motor_control::motorSteps dumbMsg;
+ros::Publisher dumbPub("dumbMotorPose", &dumbMsg);
 
 void setup(){
     
@@ -120,11 +122,17 @@ void setup(){
     steppers[3].goalPosition        = 0;
 
     node.initNode();
+    node.advertise(dumbPub);
     node.subscribe(sub);
 }
 
 //Arduino Main Loop
 void loop(){
+    dumbMsg.baseStep = steppers[0].goalPosition;
+    dumbMsg.mainStep = steppers[1].goalPosition;
+    dumbMsg.secStep  = steppers[2].goalPosition;
+    dumbMsg.toolStep = steppers[3].goalPosition;
+    dumbPub.publish(&dumbMsg);
     node.spinOnce();
     delay(1);
 }
@@ -192,15 +200,15 @@ int maxStepFunc(){
 
 void positionMotors(){
     setDirection();
-    int maxStep;
-    while (maxStep > 0){
+    //int maxStep = 800;
+    //while (maxStep > 0){
         for (int i = 0; i < 4; i++){
             if (steppers[i].currentPosition < abs(steppers[i].goalPosition)){
                 steppers[i].stepFunc();
                 steppers[i].currentPosition += steppers[i].stepInc;
             }
         }
-        maxStep -= 1;
-    }
-    delay(1);
+    //    maxStep--;
+    //}
+    delay(50);
 }
