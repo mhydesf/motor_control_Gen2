@@ -44,12 +44,10 @@ the next position.
 
 //Stepper Structure
 struct StepperDef{
-    void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: High/Low)
+    void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: Low/High)
     void (*stepFunc)();         //Discrete Step Function
 
-    //bool state = true;          //True = Ready for Next Coor ::: False = In Motion
-
-    int stepInc = 1;            //Counts step (+/-) 1
+    int stepInc = -1;            //Step Increment (+1 for CW Motion ::: -1 for CCW Motion)
 
     long previousPosition;      //Position in Steps before more started
     long currentPosition;       //Position in Steps per discrete motion
@@ -61,7 +59,6 @@ volatile StepperDef steppers[NumSteppers];
 
 #include <ros.h>
 #include <motor_control/motorSteps.h>
-#include <std_msgs/Bool.h>
 
 ros::NodeHandle  node;
 
@@ -73,9 +70,6 @@ void messageCb(motor_control::motorSteps &msg){
 }
 
 ros::Subscriber<motor_control::motorSteps> poseSub("motorPoseSteps", &messageCb );
-
-std_msgs::Bool stateMsg;
-ros::Publisher statePub("arduinoState", &stateMsg);
 
 void setup(){
     
@@ -102,39 +96,35 @@ void setup(){
     //Assigning Step and Dir functions to Stepper List
     steppers[0].dirFunc             = baseDir;
     steppers[0].stepFunc            = baseStep;
-    steppers[0].state               = true;
     steppers[0].currentPosition     = 0;
     steppers[0].previousPosition    = 0;
     steppers[0].goalPosition        = 0;
 
     steppers[1].dirFunc             = mainDir;
     steppers[1].stepFunc            = mainStep;
-    steppers[1].state               = true;
     steppers[1].currentPosition     = 0;
     steppers[1].previousPosition    = 0;
     steppers[1].goalPosition        = 0;
 
     steppers[2].dirFunc             = secDir;
     steppers[2].stepFunc            = secStep;
-    steppers[2].state               = true;
     steppers[2].currentPosition     = 0;
     steppers[2].previousPosition    = 0;
     steppers[2].goalPosition        = 0;
 
     steppers[3].dirFunc             = toolDir;
     steppers[3].stepFunc            = toolStep;
-    steppers[3].state               = true;
     steppers[3].currentPosition     = 0;
     steppers[3].previousPosition    = 0;
     steppers[3].goalPosition        = 0;
 
     node.initNode();
-    node.advertise(statePub);
     node.subscribe(poseSub);
 }
 
 //Arduino Main Loop
 void loop(){
+    positionMotors();
     node.spinOnce();
 }
 
@@ -178,6 +168,18 @@ void toolDir(int dir){
     digitalWrite(toolDirPin, dir);
 }
 
+void directionControl(){
+    for (int i = 0; i < 4; i++){
+        if (steppers[i].goalPosition - steppers[i].currentPosition > 0){
+            steppers[i].dirFunc(0);
+        }
+        else{
+            steppers[i].dirFunc(1);
+            steppers[i].stepInc = 1;
+        }
+    }
+}
+
 int maxSteps(){
     //Returns the maximum steps from the largest goal step position
     return max(max(max(steppers[0].goalPosition, steppers[1].goalPosition), steppers[2].goalPosition), steppers[3].goalPosition);
@@ -185,15 +187,18 @@ int maxSteps(){
 
 void positionMotors() {
     int currMaxSteps = maxSteps();
-    for (int i = 0; i < currMaxSteps; i++) {
-        for (int j = 0; j < 4, j++){
-            if (i < steppers[j].goalPosition){
-                steppers[j].stepFunc;
+    directionControl();
+    for (int i = 0; i < currMaxSteps; i++){
+        for (int j = 0; j < 4; j++){
+            if (steppers[j].currentPosition < steppers[j].goalPosition){
+                steppers[j].stepFunc();
                 steppers[j].currentPosition += steppers[j].stepInc;
             }
             else{
-                steppers[i].previousPosition = steppers[i].goalPosition
+                steppers[j].previousPosition = steppers[j].currentPosition;
+                steppers[j].goalPosition = 0;
             }
+            delay(1);
         }
     }
 }
