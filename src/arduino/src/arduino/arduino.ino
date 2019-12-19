@@ -47,7 +47,7 @@ struct StepperDef{
     void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: High/Low)
     void (*stepFunc)();         //Discrete Step Function
 
-    bool state = true;          //True = Ready for Next Coor ::: False = In Motion
+    //bool state = true;          //True = Ready for Next Coor ::: False = In Motion
 
     int stepInc = 1;            //Counts step (+/-) 1
 
@@ -75,7 +75,7 @@ void messageCb(motor_control::motorSteps &msg){
 ros::Subscriber<motor_control::motorSteps> poseSub("motorPoseSteps", &messageCb );
 
 std_msgs::Bool stateMsg;
-ros::Publisher statePub("dumbMotorPose", &stateMsg);
+ros::Publisher statePub("arduinoState", &stateMsg);
 
 void setup(){
     
@@ -138,6 +138,7 @@ void loop(){
     node.spinOnce();
 }
 
+//Base Step Function
 void baseStep(){
     baseStepH
     baseStepL
@@ -147,6 +148,7 @@ void baseDir(int dir){
     digitalWrite(baseDirPin, dir);
 }
 
+//Main Step Function
 void mainStep(){
     mainStepH
     mainStepL
@@ -156,6 +158,7 @@ void mainDir(int dir){
     digitalWrite(mainDirPin, dir);
 }
 
+//Sec Step Function
 void secStep(){
     secStepH
     secStepL
@@ -165,6 +168,7 @@ void secDir(int dir){
     digitalWrite(secDirPin, dir);
 }
 
+//Tool Step Function
 void toolStep(){
     toolStepH
     toolStepL
@@ -172,4 +176,24 @@ void toolStep(){
 
 void toolDir(int dir){
     digitalWrite(toolDirPin, dir);
+}
+
+int maxSteps(){
+    //Returns the maximum steps from the largest goal step position
+    return max(max(max(steppers[0].goalPosition, steppers[1].goalPosition), steppers[2].goalPosition), steppers[3].goalPosition);
+}
+
+void positionMotors() {
+    int currMaxSteps = maxSteps();
+    for (int i = 0; i < currMaxSteps; i++) {
+        for (int j = 0; j < 4, j++){
+            if (i < steppers[j].goalPosition){
+                steppers[j].stepFunc;
+                steppers[j].currentPosition += steppers[j].stepInc;
+            }
+            else{
+                steppers[i].previousPosition = steppers[i].goalPosition
+            }
+        }
+    }
 }
