@@ -47,7 +47,7 @@ struct StepperDef{
     void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: Low/High)
     void (*stepFunc)();         //Discrete Step Function
 
-    int stepInc = -1;            //Step Increment (+1 for CW Motion ::: -1 for CCW Motion)
+    int stepInc = 1;            //Step Increment (+1 for CW Motion ::: -1 for CCW Motion)
 
     long previousPosition;      //Position in Steps before more started
     long currentPosition;       //Position in Steps per discrete motion
@@ -169,7 +169,7 @@ void toolDir(int dir){
 }
 
 void directionControl(){
-    for (int i = 0; i < 4; i++){
+    for (int i = 0; i < NumSteppers; i++){
         if (steppers[i].goalPosition - steppers[i].currentPosition > 0){
             steppers[i].dirFunc(0);
         }
@@ -189,7 +189,7 @@ void positionMotors() {
     int currMaxSteps = maxSteps();
     directionControl();
     for (int i = 0; i < currMaxSteps; i++){
-        for (int j = 0; j < 4; j++){
+        for (int j = 0; j < NumSteppers; j++){
             if (steppers[j].currentPosition < steppers[j].goalPosition){
                 steppers[j].stepFunc();
                 steppers[j].currentPosition += steppers[j].stepInc;
