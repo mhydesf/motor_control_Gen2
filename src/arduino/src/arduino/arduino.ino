@@ -11,6 +11,12 @@ At this point, the arduino will let the system know it is ready for
 the next position.
 */
 
+//////////////////////////////////////////////////////////////////////////////////
+
+///////////////                 Global Parameters                  ///////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
 #define resolutionL1        2     //Base And Main Step Resolution Pin1
 #define resolutionL2        3     //Base And Main Step Resolution Pin2
 #define resolutionR1        8     //Sec. And Tool Step Resolution Pin1
@@ -42,27 +48,80 @@ the next position.
 
 #define NumSteppers         4     //Number of Steppers in System
 
-//Stepper Structure
-struct StepperDef{
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+///////////////                Stepper Structure                   ///////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+void baseStep(){                        //Base Step Function
+    baseStepH
+    baseStepL
+}
+
+void baseDir(int dir){                  //Base Direction Function
+    digitalWrite(baseDirPin, dir);
+}
+
+void mainStep(){                        //Main Step Function
+    mainStepH
+    mainStepL
+}
+
+void mainDir(int dir){                  //Main Direction Function
+    digitalWrite(mainDirPin, dir);
+}
+
+void secStep(){                         //Sec Step Function
+    secStepH
+    secStepL
+}
+
+void secDir(int dir){                   //Sec Direction Function
+    digitalWrite(secDirPin, dir);
+}
+
+void toolStep(){                        //Tool Step Function
+    toolStepH
+    toolStepL
+}
+
+void toolDir(int dir){                  //Tool Direction Function
+    digitalWrite(toolDirPin, dir);
+}
+
+struct StepperDef{              /****Stepper Structure****/
     void (*dirFunc)(int);       //Discrete Direction Function (Takes 0/1 ::: Low/High)
     void (*stepFunc)();         //Discrete Step Function
 
-    int stepInc = 1;            //Step Increment (+1 for CW Motion ::: -1 for CCW Motion)
+    int stepInc;                //Step Increment (+1 for CW Motion ::: -1 for CCW Motion)
 
     long previousPosition;      //Position in Steps before more started
     long currentPosition;       //Position in Steps per discrete motion
     long goalPosition;          //Position in Steps that needs to be achieved
+    long discreteStep;          //Steps for goal to goal
 };
 
-//List of Steppers defined as a list of length 4
-volatile StepperDef steppers[NumSteppers];
+volatile StepperDef steppers[NumSteppers];  //List of Steppers
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+///////////////                  ROS Parameters                    ///////////////
+
+//////////////////////////////////////////////////////////////////////////////////
 
 #include <ros.h>
 #include <motor_control/motorSteps.h>
 
 ros::NodeHandle  node;
 
-void messageCb(motor_control::motorSteps &msg){
+void messageCb(motor_control::motorSteps &msg){     /* Defines Goal For Each MotorPose Step Publication */
     steppers[0].goalPosition = msg.baseStep;
     steppers[1].goalPosition = msg.mainStep;
     steppers[2].goalPosition = msg.secStep;
@@ -70,6 +129,63 @@ void messageCb(motor_control::motorSteps &msg){
 }
 
 ros::Subscriber<motor_control::motorSteps> poseSub("motorPoseSteps", &messageCb );
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+///////////////                    Motor Logic                     ///////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+void setDiscreteSteps(){
+    //Sets the direction and amount of steps per positioning cycle
+    for (int i = 0; i < NumSteppers; i++){
+        steppers[i].discreteStep = steppers[i].goalPosition - steppers[i].currentPosition;
+        if (steppers[i].discreteStep >= 0){     // IF Discrete Steps Positive
+            steppers[i].dirFunc(0);             // Move CCW
+            steppers[i].stepInc = 1;            // Define Motion as (+)
+        }
+        else if (steppers[i].discreteStep < 0){
+            steppers[i].discreteStep = abs(steppers[i].discreteStep);   // Convert CW Motion to Positive Steps
+            steppers[i].dirFunc(1);                                     // Move CW
+            steppers[i].stepInc = -1;                                   // Define Motion as (-)
+        }
+    }
+}
+
+int maxSteps(){
+    //Returns the maximum steps from the largest goal step position
+    return max(max(max(steppers[0].discreteStep, steppers[1].discreteStep), steppers[2].discreteStep), steppers[3].discreteStep);
+}
+
+void positionMotors() {
+    setDiscreteSteps();                                                         // Define Required Steps to Goal
+    int currMaxSteps = maxSteps();                                              // Return Largest Step Difference
+    for (int i = 0; i < currMaxSteps; i++){                     
+        for (int j = 0; j < NumSteppers; j++){
+            if (i < steppers[j].discreteStep){                                  // IF there are steps to take
+                steppers[j].stepFunc();                                         // Step
+                steppers[j].currentPosition += steppers[j].stepInc;             // Update Current Position
+            }
+            else{                                                               // Motion is Done
+                steppers[j].previousPosition = steppers[j].currentPosition;     // Update Previous Position`
+                steppers[j].goalPosition = steppers[j].currentPosition;         // Update Goal to hold position until new position is defined
+            }
+            delay(1);                                                           // Defines speed per interval
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////
+
+///////////////              Arduino Setup + Loop                  ///////////////
+
+//////////////////////////////////////////////////////////////////////////////////
 
 void setup(){
     
@@ -126,79 +242,4 @@ void setup(){
 void loop(){
     positionMotors();
     node.spinOnce();
-}
-
-//Base Step Function
-void baseStep(){
-    baseStepH
-    baseStepL
-}
-
-void baseDir(int dir){
-    digitalWrite(baseDirPin, dir);
-}
-
-//Main Step Function
-void mainStep(){
-    mainStepH
-    mainStepL
-}
-
-void mainDir(int dir){
-    digitalWrite(mainDirPin, dir);
-}
-
-//Sec Step Function
-void secStep(){
-    secStepH
-    secStepL
-}
-
-void secDir(int dir){
-    digitalWrite(secDirPin, dir);
-}
-
-//Tool Step Function
-void toolStep(){
-    toolStepH
-    toolStepL
-}
-
-void toolDir(int dir){
-    digitalWrite(toolDirPin, dir);
-}
-
-void directionControl(){
-    for (int i = 0; i < NumSteppers; i++){
-        if (steppers[i].goalPosition - steppers[i].currentPosition > 0){
-            steppers[i].dirFunc(0);
-        }
-        else{
-            steppers[i].dirFunc(1);
-            steppers[i].stepInc = 1;
-        }
-    }
-}
-
-int maxSteps(){
-    //Returns the maximum steps from the largest goal step position
-    return max(max(max(steppers[0].goalPosition, steppers[1].goalPosition), steppers[2].goalPosition), steppers[3].goalPosition);
-}
-
-void positionMotors() {
-    int currMaxSteps = maxSteps();
-    directionControl();
-    for (int i = 0; i < currMaxSteps; i++){
-        for (int j = 0; j < NumSteppers; j++){
-            if (steppers[j].currentPosition < steppers[j].goalPosition){
-                steppers[j].stepFunc();
-                steppers[j].currentPosition += steppers[j].stepInc;
-            }
-            else{
-                steppers[j].previousPosition = steppers[j].currentPosition;
-                steppers[j].goalPosition = 0;
-            }
-            delay(1);
-        }
-    }
 }
