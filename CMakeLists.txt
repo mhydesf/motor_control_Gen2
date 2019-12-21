@@ -57,7 +57,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   DIRECTORY srv
-  FILES coordinatePass.srv motorPose.srv
+  FILES coordinatePass.srv
 )
 
 ## Generate actions in the 'action' folder
