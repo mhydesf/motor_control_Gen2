@@ -11,6 +11,7 @@ steps and angles for each of the four motors.
 '''
 
 from math import pi, atan2, acos
+import rospy
 
 class dataConverter(object):
     '''
@@ -19,8 +20,8 @@ class dataConverter(object):
     '''
     def __init__(self, positionVector):
         self.vector = positionVector
-        self.mainArmLength = 7
-        self.secArmLength = 4
+        self.mainArmLength = rospy.get_param('main_arm_length')
+        self.secArmLength = rospy.get_param('sec_arm_length')
 
     def baseAngle(self): ### I HATE THIS FUNCTION ###
         '''

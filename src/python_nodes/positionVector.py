@@ -3,6 +3,7 @@
 '''
 Commuinicates with arduino to control motors
 '''
+
 from math import atan, pi, sqrt
 from dataPuller import dataPuller
 
