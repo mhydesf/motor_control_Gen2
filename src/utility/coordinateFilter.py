@@ -13,7 +13,7 @@ steps and angles for each of the four motors.
 from math import pi, atan2, acos
 import rospy
 
-class dataFilter(object):
+class coordinateFilter(object):
     '''
     Consists of math utils for the /coordinatePass
     Service. Integrated into Service Client.

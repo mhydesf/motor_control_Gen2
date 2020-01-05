@@ -14,7 +14,7 @@ import rospy
 from motor_control.msg import motorSteps
 from std_msgs.msg import Bool
 from utility.positionVector import positionVector
-from utility.dataFilter import dataFilter
+from utility.coordinateFilter import coordinateFilter
 
 class motorPosePub(object):
     '''
@@ -23,7 +23,7 @@ class motorPosePub(object):
     '''
     def __init__(self):
         self.positionVector = positionVector()
-        self.dataFilter = dataFilter(self.positionVector)
+        self.coordinateFilter = coordinateFilter(self.positionVector)
         self.msg = motorSteps()
 
         self.poseSub = rospy.Subscriber('arduinoState', Bool, self.arduinoStateCallback)
@@ -45,19 +45,19 @@ class motorPosePub(object):
 
     def defineAngles(self):
         '''
-        Uses dataFilter to return the equivalent
+        Uses coordinateFilter to return the equivalent
         angles of each motor
         '''
         self.baseAng, self.mainAng, self.secAng, \
-                    self.toolAng = self.dataFilter.returnAngles()
+                    self.toolAng = self.coordinateFilter.returnAngles()
 
     def defineSteps(self):
         '''
-        Uses dataFilter to return the equivalent
+        Uses coordinateFilter to return the equivalent
         steps of each motor
         '''
         self.msg.baseStep, self.msg.mainStep, self.msg.secStep, \
-                    self.msg.toolStep = self.dataFilter.returnSteps()
+                    self.msg.toolStep = self.coordinateFilter.returnSteps()
 
     def arduinoStateCallback(self, arduinoState):
         '''
