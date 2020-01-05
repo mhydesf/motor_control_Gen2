@@ -20,8 +20,8 @@ class dataFilter(object):
     '''
     def __init__(self, positionVector):
         self.vector = positionVector
-        self.mainArmLength = rospy.get_param('main_arm_length')
-        self.secArmLength = rospy.get_param('sec_arm_length')
+        self.mainArmLength = rospy.get_param('mainArmLength')
+        self.secArmLength = rospy.get_param('secArmLength')
 
     def baseAngle(self): ### I HATE THIS FUNCTION ###
         '''

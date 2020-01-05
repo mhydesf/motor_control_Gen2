@@ -12,7 +12,7 @@ import sys
 import rospy
 from motor_control.srv import coordinatePass
 
-class dataPuller(object):
+class dataFrameClient(object):
     '''
     Actual Client for the /coordinatePass Service.
     Perpetually pulls coordinates from the dataFrame

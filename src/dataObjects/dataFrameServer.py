@@ -22,10 +22,6 @@ class server(object):
 
     topic =  /coordinatePass
     node  =  /coordinatePassServer
-
-    Control via terminal using:
-
-    rosservice call /coordinatePass 1
     '''
     def __init__(self, filePath):
         self.roboRoutine = DataFrame(read_csv(filePath, sep=","))
@@ -58,7 +54,7 @@ class server(object):
         Requeset Message Type - Boolean
         Any message from the client will trigger the function
         '''
-        if req:
+        if req.request == True:
             resp = coordinatePassResponse()
             resp.xCoordinate, resp.yCoordinate, \
             resp.zCoordinate = self.roboRoutine.values[self.index, :]
@@ -76,11 +72,12 @@ class server(object):
         self.countInstructions()
         rospy.Service('coordinatePass', coordinatePass, self.handleRequest)
         rospy.spin()
+
 if __name__ == '__main__':
     try:
         print 'Server Running ... '
         rospy.init_node('coordinatePassSever')
-        serv = server("~/catkin_ws/src/motor_control_Gen2/src/testCoordinates.csv")
+        serv = server("~/catkin_ws/src/motor_control_Gen2/src/dataObjects/testCoordinates.csv")
         serv.runServer()
     except rospy.ROSInterruptException():
         pass

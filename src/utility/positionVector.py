@@ -5,7 +5,7 @@ Commuinicates with arduino to control motors
 '''
 
 from math import atan, pi, sqrt
-from dataPuller import dataPuller
+from dataObjects.dataFrameClient import dataFrameClient
 
 class positionVector(object):
     '''
@@ -13,7 +13,7 @@ class positionVector(object):
     of the arm.
     '''
     def __init__(self):
-        self.dataPuller = dataPuller()
+        self.dataFrameClient = dataFrameClient()
         self.xCoor = 0
         self.yCoor = 0
         self.zCoor = 0
@@ -26,7 +26,7 @@ class positionVector(object):
         of the dataDistributer (which is also in charge
         of tracking the current index).
         '''
-        [self.xCoor, self.yCoor, self.zCoor] = self.dataPuller.client()
+        [self.xCoor, self.yCoor, self.zCoor] = self.dataFrameClient.client()
 
     def vectorCheck(self):
         '''
