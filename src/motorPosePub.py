@@ -13,8 +13,8 @@ into the respective arm angles and steps.
 import rospy
 from motor_control.msg import motorSteps
 from std_msgs.msg import Bool
-from positionVector import positionVector
-from dataConverter import dataConverter
+from dataObjects.positionVector import positionVector
+from dataObjects.dataFilter import dataFilter
 
 class motorPosePub(object):
     '''
@@ -23,7 +23,7 @@ class motorPosePub(object):
     '''
     def __init__(self):
         self.positionVector = positionVector()
-        self.dataConverter = dataConverter(self.positionVector)
+        self.dataConverter = dataFilter(self.positionVector)
         self.msg = motorSteps()
 
         self.poseSub = rospy.Subscriber('arduinoState', Bool, self.arduinoStateCallback)
