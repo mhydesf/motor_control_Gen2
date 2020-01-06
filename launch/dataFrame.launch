@@ -1,5 +1,5 @@
 <launch>
     <node name="setParams" pkg="motor_control" type="params.py"/>
-    <node name="dataFrame" pkg="motor_control" type="dataFrame.py"/>
-    <node name="motorPosePub" pkg="motor_control" type="motorPosePub.py"/>
+    <node name="dataFrameServer" pkg="motor_control" type="dataFrameServer.py"/>
+    <node name="stepperImp" pkg="motor_control" type="stepperImp.py"/>
 </launch>

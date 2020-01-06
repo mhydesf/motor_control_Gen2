@@ -12,29 +12,25 @@ class stepper(object):
     '''
     def __init__(self, params):
 
-        self.directionPin = rospy.get_param(params[0])
-        self.stepPin = rospy.get_param(params[1])
+        self.name = params[0]
 
-        self.currentPosition = rospy.get_param(params[2])
-        self.goalPosition = rospy.get_param(params[2])
+        self.directionPin = rospy.get_param(params[1])
+        self.stepPin = rospy.get_param(params[2])
 
-        self.gearRatio = rospy.get_param(params[3])
+        self.currentPosition = rospy.get_param(params[3])
+        self.goalPosition = rospy.get_param(params[3])
 
-    def updateGoal(self):
-        pass
+        self.gearRatio = rospy.get_param(params[4])
+
+    def updateGoal(self, goal):
+        self.goalPosition = goal
+        rospy.loginfo('%s: Step Position - %s'%(self.name, goal))
 
     def setDirection(self):
-        pass
+        if self.goalPosition - self.currentPosition > 0:
+            return 0
+        else:
+            return 1
     
     def stepsToComplete(self):
-        pass
-
-if __name__ == '__main__':
-    baseStepDef = ['baseDirPin', 'baseStepPin', 'baseHome', 'baseGR']
-    mainStepDef = ['mainDirPin', 'mainStepPin', 'mainHome', 'mainGR']
-    secStepDef = ['secDirPin', 'secStepPin', 'secHome', 'secGR']
-    toolStepDef = ['toolDirPin', 'toolStepPin', 'toolHome', 'toolGR']
-    baseStepper = stepper(baseStepDef)
-    mainStepper = stepper(mainStepDef)
-    secStepper = stepper(secStepDef)
-    toolStepper = stepper(toolStepDef)
+        return abs(self.goalPosition - self.currentPosition)
